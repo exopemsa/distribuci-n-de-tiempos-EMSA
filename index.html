@@ -240,7 +240,22 @@ https://sheetjs.com/
     footer{flex-wrap:wrap;row-gap:8px}
     .creator-signature{flex-basis:100%;text-align:right;color:#5d737c;font-size:11px;font-weight:500}
     @media(max-width:600px){.topbar{height:auto;min-height:73px;flex-direction:column;align-items:flex-start;gap:12px;padding:18px 20px}.brand{font-size:18px}.local-indicator{margin-left:0}.creator-signature{flex-basis:auto;text-align:left}}
-  </style>
+
+    .distribution-chart{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:38px;align-items:center;padding:0 30px 25px;max-width:1000px;margin:auto}
+    #distribution-pie{display:block;width:100%;height:auto;overflow:visible}
+    .pie-label{fill:#fff;font-size:12px;font-weight:650;paint-order:stroke;stroke:#15323e55;stroke-width:2px}
+    .pie-legend{list-style:none;padding:0;margin:0;display:grid;gap:0}
+    .pie-legend-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #edf0ef;font-size:11px;transition:opacity .3s ease}
+    .pie-legend-item:last-child{border-bottom:0}.pie-legend-item.is-empty{opacity:.5}
+    .legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}.legend-name{font-weight:650}
+    .legend-value{margin-left:auto;text-align:right;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}.legend-value strong{color:var(--ink);display:inline-block;min-width:65px;margin-left:10px;font-weight:600}
+    .chart-empty{font-size:12px;color:var(--muted);line-height:1.7}
+    .pivot-table tr,.pivot-table td,.pivot-table span{transition:background-color .3s ease,color .3s ease}
+    .subcategory-row{animation:detail-in .22s ease-out}
+    @keyframes detail-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:760px){.distribution-chart{grid-template-columns:1fr;gap:12px;padding:0 18px 20px}#distribution-pie{max-width:260px;margin:auto}.pie-legend-item{font-size:10px;padding:8px 0}.legend-value strong{min-width:57px;margin-left:7px}}
+    @media print{.distribution-chart{grid-template-columns:240px 1fr;print-color-adjust:exact}.redistribution-checkbox,#select-file{display:none!important}}
+</style>
 </head>
 <body>
   <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -274,16 +289,6 @@ https://sheetjs.com/
     <div id="import-status" role="status" aria-live="polite" class="import-status" hidden></div>
     <div id="import-error" role="alert" class="notice notice-error" hidden></div>
 
-    <section id="welcome" class="welcome">
-      <div class="welcome-intro"><span class="section-tag">DEL REPORTE AL ANÁLISIS</span><h2>Una visión clara de cada minuto.</h2><p>Importa un reporte para conocer cómo se distribuye el tiempo y simular una operación sin esperas ni mantenciones.</p></div>
-      <div class="workflow-grid">
-        <article class="workflow-card"><span class="step-number">01</span><div class="workflow-symbol"><svg class="icon"><use href="#i-chart"/></svg></div><h3>Tiempo registrado</h3><p>Actividades agrupadas por categoría y subcategoría, con sus minutos y su participación en el total.</p></article>
-        <article class="workflow-card"><span class="step-number">02</span><div class="workflow-symbol"><svg class="icon"><use href="#i-arrow"/></svg></div><h3>Redistribución proporcional</h3><p>Por defecto, el tiempo de TEContratista, TEM - Operando, TEM - NO Operando y TMR se reparte entre TEO y TCOpe según su peso original.</p></article>
-        <article class="workflow-card"><span class="step-number">03</span><div class="workflow-symbol"><svg class="icon"><use href="#i-check"/></svg></div><h3>Escenario ideal</h3><p>Los mismos minutos totales, con una nueva distribución. Compara el resultado y abre el detalle de cada categoría.</p></article>
-      </div>
-      <div class="calculation-note"><svg class="icon"><use href="#i-info"/></svg><p><strong>La base del cálculo</strong> Cada actividad suma <code>HORAS CLIENTE + HORAS EECC</code>, expresadas en minutos. La matriz de clasificación ya está incorporada.</p></div>
-    </section>
-
     <div id="results" hidden>
       <section class="report-strip" aria-label="Reporte importado"><div class="report-file"><svg class="icon"><use href="#i-file"/></svg><div><strong id="report-name"></strong><span id="report-context"></span></div></div><span class="report-badge"><svg class="icon"><use href="#i-check"/></svg>Reporte procesado</span></section>
       <div id="diagnostics" hidden></div>
@@ -291,27 +296,28 @@ https://sheetjs.com/
         <article class="kpi-card"><p>TIEMPO TOTAL REGISTRADO</p><strong id="kpi-total">—</strong><span id="kpi-total-detail">Minutos en el reporte</span></article>
         <article class="kpi-card"><p>ACTIVIDADES ANALIZADAS</p><strong id="kpi-rows">—</strong><span id="kpi-rows-detail">Filas de la hoja Detalles</span></article>
         <article class="kpi-card kpi-warm"><p>TIEMPO A REDISTRIBUIR</p><strong id="kpi-pool">—</strong><span id="kpi-pool-detail">Del tiempo total</span></article>
-        <article class="kpi-card kpi-teal"><p>TEO + TCOPE EN ESCENARIO IDEAL</p><strong id="kpi-ideal">—</strong><span id="kpi-ideal-detail">Del tiempo total</span></article>
+        <article class="kpi-card kpi-teal"><p>TEO + TCOPE EN LA DISTRIBUCIÓN</p><strong id="kpi-ideal">—</strong><span id="kpi-ideal-detail">Del tiempo total</span></article>
       </section>
 
-      <section class="analysis-card" aria-labelledby="original-title">
-        <div class="card-heading"><div class="number-title"><span class="section-number">01</span><div><h2 id="original-title">Distribución registrada</h2><p>Minutos y participación sobre el total del reporte.</p></div></div><button type="button" class="text-button" data-expand="original">Expandir todo</button></div>
-        <div id="original-chart" class="composition-chart" aria-label="Composición del tiempo registrado"></div>
-        <div id="original-table" class="table-container"></div>
-        <div class="table-note"><svg class="icon"><use href="#i-info"/></svg>Usa las casillas para seleccionar los tiempos a redistribuir. Rojo: selección completa; naranja: selección parcial. Abre una categoría para elegir sus subcategorías.</div>
+      <section class="analysis-card ideal-card" aria-labelledby="distribution-title-main">
+        <div class="card-heading"><div class="number-title"><span class="section-number">01</span><div><h2 id="distribution-title-main">Distribución de tiempos entre Categorías</h2><p>Selecciona los tiempos que quieras redistribuir entre TEO y TCOpe.</p></div></div><div class="card-actions"><span class="tag tag-teal" id="conservation-label"><svg class="icon"><use href="#i-check"/></svg>Total conservado</span><button type="button" class="text-button" data-expand="distribution">Expandir todo</button></div></div>
+        <div id="ideal-unavailable" class="notice notice-warning" hidden></div>
+        <div class="distribution-chart" id="distribution-chart">
+          <svg id="distribution-pie" viewBox="0 0 300 300" role="img" aria-labelledby="pie-title pie-description">
+            <title id="pie-title">Distribución de tiempos por categoría</title>
+            <desc id="pie-description"></desc>
+            <circle cx="150" cy="150" r="138" fill="#edf1f0"></circle>
+            <g id="pie-slices"></g><g id="pie-labels" aria-hidden="true"></g>
+          </svg>
+          <div><p class="chart-empty" id="chart-empty" hidden>No hay minutos válidos para mostrar en el gráfico.</p><ul id="pie-legend" class="pie-legend" aria-label="Minutos y porcentaje por categoría"></ul></div>
+        </div>
+        <div id="distribution-table" class="table-container"></div>
+        <div class="table-note"><svg class="icon"><use href="#i-info"/></svg>Rojo: selección completa; naranja: selección parcial. Los tiempos seleccionados se reparten entre TEO y TCOpe según su proporción original. El indicador verde muestra el aumento en puntos porcentuales (pp).</div>
       </section>
 
       <section class="redistribution-card" aria-labelledby="distribution-title">
         <div class="card-heading"><div class="number-title"><span class="section-number">02</span><div><h2 id="distribution-title">Redistribución de tiempos</h2><p>Selecciona categorías o subcategorías para repartir sus minutos entre TEO y TCOpe.</p></div></div><span class="tag tag-warm">CRITERIO PROPORCIONAL</span></div>
         <div id="redistribution-content"></div>
-      </section>
-
-      <section class="analysis-card ideal-card" aria-labelledby="ideal-title">
-        <div class="card-heading"><div class="number-title"><span class="section-number">03</span><div><h2 id="ideal-title">Escenario ideal</h2><p>La distribución resultante después de reasignar los tiempos.</p></div></div><div class="card-actions"><span class="tag tag-teal" id="conservation-label"><svg class="icon"><use href="#i-check"/></svg>Total conservado</span><button type="button" class="text-button" data-expand="ideal">Expandir todo</button></div></div>
-        <div id="ideal-unavailable" class="notice notice-warning" hidden></div>
-        <div id="ideal-chart" class="composition-chart" aria-label="Composición del tiempo en el escenario ideal"></div>
-        <div id="ideal-table" class="table-container"></div>
-        <div class="table-note"><svg class="icon"><use href="#i-info"/></svg>Los incrementos se distribuyen entre las subcategorías de TEO y TCOpe según sus minutos originales. Los tiempos no seleccionados se conservan. El indicador verde muestra el aumento relativo respecto al tiempo original.</div>
       </section>
     </div>
     <footer><span><strong>EMSA</strong> · Análisis de rendimiento operacional</span><span>Matriz incorporada <span class="footer-dot">·</span> Cálculos en minutos <span class="footer-dot">·</span> Versión 1.0</span><span class="creator-signature">Creada por Agustín Muñoz R.</span></footer>
@@ -749,7 +755,10 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
   let busy = false;
   let previousFocus = null;
   let dragDepth = 0;
-  const expanded = { original: new Set(), ideal: new Set() };
+  const expanded = new Set();
+  let pieFrame = 0;
+  let pieValues = [];
+  let pieCategories = '';
 
   const escapeHTML = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const format = (value) => numberFormat.format(value || 0);
@@ -785,8 +794,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
       const workbook = XLSX.read(buffer, { type: 'array', cellDates: false, cellFormula: true, cellHTML: false, cellStyles: false });
       const result = EMSAEngine.analyzeWorkbook(workbook, matrix);
       analysis = result;
-      expanded.original.clear();
-      expanded.ideal.clear();
+      expanded.clear();
       renderAnalysis(file.name);
       setStatus('Reporte procesado: ' + integerFormat.format(result.validRowCount) + ' actividades con minutos válidos.');
     } catch (error) {
@@ -806,7 +814,6 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
   function renderAnalysis(filename) {
     const a = analysis;
     const r = a.redistribution;
-    $('welcome').hidden = true;
     $('results').hidden = false;
     $('drop-zone').hidden = true;
     $('heading-actions').appendChild($('select-file'));
@@ -833,9 +840,36 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     $('ideal-unavailable').hidden = r.possible;
     $('ideal-unavailable').textContent = r.reason + ' La tabla conserva la distribución original hasta que sea posible calcularla.';
     renderDiagnostics();
-    renderPivot('original');
+    renderDistribution();
+    renderPie();
     renderRedistribution();
-    renderPivot('ideal');
+  }
+
+  function updateContent(id, markup) {
+    const template = document.createElement('template');
+    template.innerHTML = markup;
+    function syncChildren(current, next) {
+      Array.from(next.childNodes).forEach((child, index) => {
+        const existing = current.childNodes[index];
+        if (!existing) current.appendChild(child.cloneNode(true));
+        else if (existing.nodeType !== child.nodeType || existing.nodeName !== child.nodeName) existing.replaceWith(child.cloneNode(true));
+        else if (child.nodeType === Node.TEXT_NODE) {
+          if (existing.nodeValue !== child.nodeValue) existing.nodeValue = child.nodeValue;
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          const preserveOpen = child.tagName === 'DETAILS';
+          Array.from(existing.attributes).forEach((attr) => {
+            if (!child.hasAttribute(attr.name) && !(preserveOpen && attr.name === 'open')) existing.removeAttribute(attr.name);
+          });
+          Array.from(child.attributes).forEach((attr) => {
+            if (!(preserveOpen && attr.name === 'open') && existing.getAttribute(attr.name) !== attr.value) existing.setAttribute(attr.name, attr.value);
+          });
+          if (child.tagName === 'INPUT') existing.checked = child.checked;
+          syncChildren(existing, child);
+        }
+      });
+      while (current.childNodes.length > next.childNodes.length) current.lastChild.remove();
+    }
+    syncChildren($(id), template.content);
   }
 
   function renderDiagnostics() {
@@ -845,14 +879,23 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
       blocks.push('<details class="notice notice-error" open><summary>' + integerFormat.format(a.invalidRows.length) + ' registros con minutos inválidos: total parcial y redistribución deshabilitada</summary><p>Estos registros requieren revisión en el Excel y no se suman. Una celda vacía se considera 0 si la otra columna contiene minutos; si ambas están vacías, el registro se marca para revisión.</p>' + diagnosticList(a.invalidRows, (row) => 'Fila ' + row.row + ' · ' + row.activityId + ': ' + row.reason) + '</details>');
     }
     if (a.unknownRows.length) {
-      const total = EMSAEngine.sum(a.unknownRows.map((row) => row.minutes));
-      blocks.push('<details class="notice notice-warning"><summary>' + integerFormat.format(a.unknownRows.length) + ' registros sin correspondencia en la matriz · ' + format(total) + ' min conservados en SIN CLASIFICAR</summary><p>Se incluyen en el total general. Sus minutos solo se redistribuyen si seleccionas SIN CLASIFICAR. Revisa sus ID antes de interpretar el resultado.</p>' + diagnosticList(a.unknownRows, (row) => 'Fila ' + row.row + ' · ID ' + (row.activityId || '(vacío)') + ' · ' + format(row.minutes) + ' min' + (row.description ? ' · ' + row.description : '')) + '</details>');
+      const unique = new Map();
+      a.unknownRows.forEach((row) => {
+        const key = row.activityId ? 'id:' + EMSAEngine.normalizeId(row.activityId) : 'text:' + EMSAEngine.normalize(row.activity || row.description);
+        if (!unique.has(key)) unique.set(key, { ...row, count: 0, minutes: 0 });
+        const activity = unique.get(key);
+        activity.count++;
+        activity.minutes += row.minutes;
+      });
+      const activities = Array.from(unique.values());
+      const total = EMSAEngine.sum(activities.map((row) => row.minutes));
+      blocks.push('<details class="notice notice-warning"><summary>' + integerFormat.format(activities.length) + ' actividades sin clasificar · ' + integerFormat.format(a.unknownRows.length) + ' registros · ' + format(total) + ' min</summary><p>Cada actividad aparece una sola vez, con sus registros y minutos acumulados. Sus minutos solo se redistribuyen si seleccionas SIN CLASIFICAR. Revisa sus ID antes de interpretar el resultado.</p>' + diagnosticList(activities, (row) => 'ID ' + (row.activityId || '(vacío)') + (row.description || row.activity ? ' · ' + (row.description || row.activity) : '') + ' · ' + integerFormat.format(row.count) + ' registros · ' + format(row.minutes) + ' min') + '</details>');
     }
     const splitIssues = a.issues.filter((issue) => ['client_split_mismatch', 'invalid_client_split'].includes(issue.type));
     if (splitIssues.length) {
       blocks.push('<details class="notice notice-warning"><summary>' + integerFormat.format(splitIssues.length) + ' observaciones en el desglose EMSA + CODELCO</summary><p>Se mantiene HORAS CLIENTE + HORAS EECC como base del cálculo. HORAS EMSA y HORAS CODELCO sirven como comprobación y no se suman de nuevo.</p>' + diagnosticList(splitIssues, (issue) => 'Fila ' + issue.row + ' · ' + issue.message + (issue.difference != null ? ' Diferencia: ' + format(issue.difference) + ' min.' : '')) + '</details>');
     }
-    $('diagnostics').innerHTML = blocks.join('');
+    updateContent('diagnostics', blocks.join(''));
     $('diagnostics').hidden = !blocks.length;
   }
 
@@ -865,46 +908,93 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     return '<div class="percent-cell"><div class="percent-track" aria-hidden="true"><span style="width:' + Math.max(0, Math.min(100, value)) + '%;background:' + fill + '"></span></div><span class="percent-value">' + pct(value) + '</span></div>';
   }
 
-  function selectionCheckbox(mode, index, subIndex, checked, label) {
-    return '<input type="checkbox" class="redistribution-checkbox" data-selection-mode="' + mode + '" ' + (subIndex == null ? 'data-select-category="' + index + '"' : 'data-select-subcategory="' + index + '" data-sub-index="' + subIndex + '"') + (checked ? ' checked' : '') + ' aria-label="Redistribuir ' + escapeHTML(label) + '">';
+  function selectionCheckbox(index, subIndex, checked, label) {
+    return '<input type="checkbox" class="redistribution-checkbox" ' + (subIndex == null ? 'data-select-category="' + index + '"' : 'data-select-subcategory="' + index + '" data-sub-index="' + subIndex + '"') + (checked ? ' checked' : '') + ' aria-label="Redistribuir ' + escapeHTML(label) + '">';
   }
 
-  function renderPivot(mode) {
-    const adjusted = mode === 'ideal';
+  function renderDistribution() {
     const a = analysis;
-    const minutesKey = adjusted ? 'adjustedMinutes' : 'minutes';
-    const percentageKey = adjusted ? 'adjustedPercentage' : 'percentage';
+    const minutesKey = 'adjustedMinutes';
+    const percentageKey = 'adjustedPercentage';
     const rows = [];
     a.categories.forEach((cat, index) => {
-      const open = expanded[mode].has(index);
+      const open = expanded.has(index);
       const hasChildren = cat.subcategories.length > 0;
       const delta = cat.adjustedMinutes - cat.minutes;
       const selectable = !['TEO', 'TCOPE'].includes(cat.role);
       const selectedCount = cat.subcategories.filter((sub) => sub.selected).length;
       const redistributionSource = selectedCount > 0 && selectedCount === cat.subcategories.length;
       const partial = selectedCount > 0 && !redistributionSource;
-      const zeroed = adjusted && a.redistribution.possible && redistributionSource;
-      const id = mode + '-category-' + index;
+      const zeroed = a.redistribution.possible && redistributionSource;
+      const id = 'distribution-category-' + index;
       const description = '<span class="category-text"><span class="category-code">' + escapeHTML(cat.code) + '</span><span class="category-description">' + escapeHTML(cat.name) + '</span></span>';
       let category = '<span class="category-title"><span class="category-dot" style="background:' + color(cat) + '"></span>' + description + '</span>';
-      if (hasChildren) category = '<button type="button" class="category-toggle" data-pivot="' + mode + '" data-index="' + index + '" aria-expanded="' + open + '" aria-controls="' + id + '-detail" aria-label="' + (open ? 'Contraer ' : 'Expandir ') + escapeHTML(cat.code) + '">' + icon('chevron') + '<span class="category-dot" style="background:' + color(cat) + '"></span>' + description + '</button>';
-      category = '<div class="category-selection">' + (selectable ? selectionCheckbox(mode, index, null, redistributionSource, cat.code) : '') + category + '</div>';
-      const change = adjusted && a.redistribution.possible && Math.abs(delta) > 0.000001 ? '<span class="change-value' + (delta < 0 ? ' negative' : '') + '">' + (delta > 0 ? '+' : '−') + format(Math.abs(delta)) + ' min</span>' : '';
-      rows.push('<tbody><tr class="category-row' + (redistributionSource ? ' redistribution-source' : partial ? ' redistribution-partial' : '') + (zeroed ? ' zeroed' : '') + '"><td>' + category + '</td><td class="numeric"><span class="minutes-number" title="' + preciseFormat.format(cat[minutesKey]) + ' min">' + format(cat[minutesKey]) + '</span>' + change + '</td><td class="numeric">' + percentageCell(cat[percentageKey], color(cat)) + (adjusted && a.redistribution.possible && ['TEO', 'TCOPE'].includes(cat.role) && cat.minutes > 0 ? '<span class="percentage-increase" title="Aumento relativo respecto al tiempo original">+ ' + pct(Math.max(0, delta / cat.minutes * 100)) + '</span>' : '') + '</td></tr></tbody>');
+      if (hasChildren) category = '<button type="button" class="category-toggle" data-pivot="distribution" data-index="' + index + '" aria-expanded="' + open + '" aria-controls="' + id + '-detail" aria-label="' + (open ? 'Contraer ' : 'Expandir ') + escapeHTML(cat.code) + '">' + icon('chevron') + '<span class="category-dot" style="background:' + color(cat) + '"></span>' + description + '</button>';
+      category = '<div class="category-selection">' + (selectable ? selectionCheckbox(index, null, redistributionSource, cat.code) : '') + category + '</div>';
+      const change = a.redistribution.possible && Math.abs(delta) > 0.000001 ? '<span class="change-value' + (delta < 0 ? ' negative' : '') + '">' + (delta > 0 ? '+' : '−') + format(Math.abs(delta)) + ' min</span>' : '';
+      rows.push('<tbody><tr class="category-row' + (redistributionSource ? ' redistribution-source' : partial ? ' redistribution-partial' : '') + (zeroed ? ' zeroed' : '') + '"><td>' + category + '</td><td class="numeric"><span class="minutes-number" title="' + preciseFormat.format(cat[minutesKey]) + ' min">' + format(cat[minutesKey]) + '</span>' + change + '</td><td class="numeric">' + percentageCell(cat[percentageKey], color(cat)) + (a.redistribution.possible && ['TEO', 'TCOPE'].includes(cat.role) && a.totalMinutes > 0 ? '<span class="percentage-increase" title="Aumento en puntos porcentuales respecto a la distribución original">+ ' + percentageFormat.format(Math.max(0, cat.adjustedPercentage - cat.percentage)) + ' pp' + '</span>' : '') + '</td></tr></tbody>');
       if (hasChildren) {
-        rows.push('<tbody id="' + id + '-detail"' + (open ? '' : ' hidden') + '>' + cat.subcategories.map((sub, subIndex) => '<tr class="subcategory-row' + (sub.selected ? ' redistribution-source' : '') + '"><td><div class="category-selection">' + (selectable ? selectionCheckbox(mode, index, subIndex, sub.selected, cat.code + ' · ' + sub.name) : '') + '<span class="subcategory-name">' + escapeHTML(sub.name) + '</span></div></td><td class="numeric" title="' + preciseFormat.format(sub[minutesKey]) + ' min">' + format(sub[minutesKey]) + '</td><td class="numeric">' + percentageCell(sub[percentageKey], color(cat)) + '</td></tr>').join('') + '</tbody>');
+        rows.push('<tbody id="' + id + '-detail"' + (open ? '' : ' hidden') + '>' + cat.subcategories.map((sub, subIndex) => '<tr class="subcategory-row' + (sub.selected ? ' redistribution-source' : '') + '"><td><div class="category-selection">' + (selectable ? selectionCheckbox(index, subIndex, sub.selected, cat.code + ' · ' + sub.name) : '') + '<span class="subcategory-name">' + escapeHTML(sub.name) + '</span></div></td><td class="numeric" title="' + preciseFormat.format(sub[minutesKey]) + ' min">' + format(sub[minutesKey]) + '</td><td class="numeric">' + percentageCell(sub[percentageKey], color(cat)) + '</td></tr>').join('') + '</tbody>');
       }
     });
-    const total = adjusted ? a.adjustedTotalMinutes : a.totalMinutes;
-    $('' + mode + '-table').innerHTML = '<table class="pivot-table"><caption class="visually-hidden">' + (adjusted ? 'Escenario ideal' : 'Distribución registrada') + ': categorías y subcategorías en minutos y porcentaje sobre el total general</caption><thead><tr><th scope="col">CATEGORÍA / SUBCATEGORÍA</th><th scope="col" class="numeric">TIEMPO (MIN)</th><th scope="col" class="numeric">% DEL TOTAL</th></tr></thead>' + rows.join('') + '<tfoot><tr><td>' + (a.complete ? 'TOTAL GENERAL' : 'TOTAL PARCIAL VÁLIDO') + '</td><td class="numeric">' + format(total) + '</td><td class="numeric">' + pct(a.totalMinutes ? 100 : 0) + '</td></tr></tfoot></table>';
-    $(mode + '-chart').innerHTML = a.categories.filter((cat) => cat[minutesKey] > 0).map((cat) => '<div class="composition-segment" style="width:' + cat[percentageKey] + '%;background:' + color(cat) + '" title="' + escapeHTML(cat.code) + ': ' + format(cat[minutesKey]) + ' min · ' + pct(cat[percentageKey]) + '"></div>').join('');
-    $(mode + '-table').querySelectorAll('[data-select-category]').forEach((input) => {
+    const total = a.adjustedTotalMinutes;
+    updateContent('distribution-table', '<table class="pivot-table"><caption class="visually-hidden">' + 'Distribución de tiempos entre Categorías' + ': categorías y subcategorías en minutos y porcentaje sobre el total general</caption><thead><tr><th scope="col">CATEGORÍA / SUBCATEGORÍA</th><th scope="col" class="numeric">TIEMPO (MIN)</th><th scope="col" class="numeric">% DEL TOTAL</th></tr></thead>' + rows.join('') + '<tfoot><tr><td>' + (a.complete ? 'TOTAL GENERAL' : 'TOTAL PARCIAL VÁLIDO') + '</td><td class="numeric">' + format(total) + '</td><td class="numeric">' + pct(a.totalMinutes ? 100 : 0) + '</td></tr></tfoot></table>');
+
+    $('distribution-table').querySelectorAll('[data-select-category]').forEach((input) => {
       const cat = a.categories[Number(input.dataset.selectCategory)];
       input.indeterminate = cat.subcategories.some((sub) => sub.selected) && !cat.subcategories.every((sub) => sub.selected);
     });
-    const expandButton = document.querySelector('[data-expand="' + mode + '"]');
+    const expandButton = document.querySelector('[data-expand="distribution"]');
     const expandable = a.categories.filter((cat) => cat.subcategories.length).length;
-    expandButton.textContent = expanded[mode].size === expandable && expandable > 0 ? 'Contraer todo' : 'Expandir todo';
+    expandButton.textContent = expanded.size === expandable && expandable > 0 ? 'Contraer todo' : 'Expandir todo';
+  }
+
+  function renderPie() {
+    const categories = analysis.categories;
+    const signature = JSON.stringify(categories.map((cat) => cat.code));
+    cancelAnimationFrame(pieFrame);
+    if (signature !== pieCategories) {
+      pieCategories = signature;
+      pieValues = categories.map(() => 0);
+      $('pie-slices').innerHTML = categories.map((cat) => '<path fill="' + color(cat) + '" stroke="#fff" stroke-width="1.5"><title></title></path>').join('');
+      $('pie-labels').innerHTML = categories.map(() => '<text text-anchor="middle" dominant-baseline="middle" class="pie-label"></text>').join('');
+    }
+    const target = categories.map((cat) => cat.adjustedPercentage);
+    const paths = Array.from($('pie-slices').children);
+    const labels = Array.from($('pie-labels').children);
+    const description = categories.map((cat) => cat.code + ': ' + pct(cat.adjustedPercentage)).join('; ');
+    $('pie-description').textContent = description;
+    paths.forEach((path, index) => { path.firstChild.textContent = categories[index].code + ': ' + format(categories[index].adjustedMinutes) + ' min · ' + pct(target[index]); });
+    $('chart-empty').hidden = analysis.totalMinutes > 0;
+    updateContent('pie-legend', categories.map((cat) => '<li class="pie-legend-item' + (cat.adjustedMinutes ? '' : ' is-empty') + '"><span class="legend-swatch" style="background:' + color(cat) + '"></span><span class="legend-name">' + escapeHTML(cat.code) + '</span><span class="legend-value">' + format(cat.adjustedMinutes) + ' min <strong>' + pct(cat.adjustedPercentage) + '</strong></span></li>').join(''));
+    function draw(values) {
+      pieValues = values;
+      let start = -Math.PI / 2;
+      values.forEach((value, index) => {
+        const angle = Math.max(0, value) / 100 * Math.PI * 2;
+        const end = start + angle;
+        const x1 = 150 + 138 * Math.cos(start), y1 = 150 + 138 * Math.sin(start);
+        const x2 = 150 + 138 * Math.cos(end), y2 = 150 + 138 * Math.sin(end);
+        const d = value <= 0.000001 ? '' : value >= 99.999999
+          ? 'M150 12 A138 138 0 1 1 150 288 A138 138 0 1 1 150 12 Z'
+          : 'M150 150 L' + x1 + ' ' + y1 + ' A138 138 0 ' + (angle > Math.PI ? 1 : 0) + ' 1 ' + x2 + ' ' + y2 + ' Z';
+        paths[index].setAttribute('d', d);
+        labels[index].setAttribute('x', 150 + 92 * Math.cos(start + angle / 2));
+        labels[index].setAttribute('y', 150 + 92 * Math.sin(start + angle / 2));
+        labels[index].textContent = value >= 6 ? numberFormat.format(value) + ' %' : '';
+        start = end;
+      });
+    }
+    const initial = pieValues.slice();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { draw(target); return; }
+    const began = performance.now();
+    function animate(now) {
+      const progress = Math.min(1, (now - began) / 420);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      draw(target.map((value, index) => initial[index] + (value - initial[index]) * ease));
+      if (progress < 1) pieFrame = requestAnimationFrame(animate);
+    }
+    pieFrame = requestAnimationFrame(animate);
   }
 
   function renderRedistribution() {
@@ -914,11 +1004,11 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     let proportional;
     if (r.possible) {
       const dest = (code, base, share, added, secondary) => '<article class="destination-card' + (secondary ? ' complementary' : '') + '"><div class="destination-top"><strong>' + code + '</strong><span>' + pct(share * 100) + ' de la redistribución</span></div><p class="destination-added">+' + format(added) + '<small class="unit">min</small></p><div class="destination-formula">' + format(r.pool) + ' min × (' + format(base) + ' / ' + format(r.base) + ')<br>' + format(base) + ' min originales → <strong>' + format(base + added) + ' min</strong></div></article>';
-      proportional = '<div class="proportion-panel"><div class="proportion-heading"><strong>Proporción original de la base operacional</strong><span>Base = TEO + TCOpe = ' + format(r.base) + ' min</span></div><div class="proportion-bar" role="img" aria-label="TEO ' + pct(r.teoShare * 100) + ' y TCOpe ' + pct(r.tcopeShare * 100) + '"><span class="proportion-part" style="width:' + r.teoShare * 100 + '%;background:' + colors.TEO + '">' + (r.teoShare >= .12 ? 'TEO · ' + pct(r.teoShare * 100) : '') + '</span><span class="proportion-part" style="width:' + r.tcopeShare * 100 + '%;background:' + colors.TCOpe + '">' + (r.tcopeShare >= .12 ? 'TCOpe · ' + pct(r.tcopeShare * 100) : '') + '</span></div><div class="destination-grid">' + dest('TEO', r.teoMinutes, r.teoShare, r.teoAdded, false) + dest('TCOpe', r.tcopeMinutes, r.tcopeShare, r.tcopeAdded, true) + '</div><p class="distribution-explanation">' + (r.pool ? 'Los tiempos seleccionados se reparten entre TEO y TCOpe. Las subcategorías no seleccionadas conservan sus minutos.' : 'No hay minutos seleccionados para redistribuir. El escenario ideal conserva los tiempos originales.') + ' Los cálculos conservan su precisión; la vista redondea a dos decimales.</p></div>';
+      proportional = '<div class="proportion-panel"><div class="proportion-heading"><strong>Proporción original de la base operacional</strong><span>Base = TEO + TCOpe = ' + format(r.base) + ' min</span></div><div class="proportion-bar" role="img" aria-label="TEO ' + pct(r.teoShare * 100) + ' y TCOpe ' + pct(r.tcopeShare * 100) + '"><span class="proportion-part" style="width:' + r.teoShare * 100 + '%;background:' + colors.TEO + '">' + (r.teoShare >= .12 ? 'TEO · ' + pct(r.teoShare * 100) : '') + '</span><span class="proportion-part" style="width:' + r.tcopeShare * 100 + '%;background:' + colors.TCOpe + '">' + (r.tcopeShare >= .12 ? 'TCOpe · ' + pct(r.tcopeShare * 100) : '') + '</span></div><div class="destination-grid">' + dest('TEO', r.teoMinutes, r.teoShare, r.teoAdded, false) + dest('TCOpe', r.tcopeMinutes, r.tcopeShare, r.tcopeAdded, true) + '</div><p class="distribution-explanation">' + (r.pool ? 'Los tiempos seleccionados se reparten entre TEO y TCOpe. Las subcategorías no seleccionadas conservan sus minutos.' : 'No hay minutos seleccionados para redistribuir. La distribución conserva los tiempos originales.') + ' Los cálculos conservan su precisión; la vista redondea a dos decimales.</p></div>';
     } else {
       proportional = '<div class="proportion-panel"><div class="notice notice-warning">' + escapeHTML(r.reason) + ' No se aplica ninguna redistribución.</div></div>';
     }
-    $('redistribution-content').innerHTML = '<div class="donor-grid">' + donors + '</div>' + pool + proportional;
+    updateContent('redistribution-content', '<div class="donor-grid">' + donors + '</div>' + pool + proportional);
   }
 
   function renderMatrix() {
@@ -988,28 +1078,25 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     if (input.hasAttribute('data-select-category')) cat.subcategories.forEach((sub) => { sub.selected = input.checked; });
     else cat.subcategories[Number(input.dataset.subIndex)].selected = input.checked;
     const selector = input.hasAttribute('data-select-category') ? '[data-select-category="' + index + '"]' : '[data-select-subcategory="' + index + '"][data-sub-index="' + input.dataset.subIndex + '"]';
-    const mode = input.dataset.selectionMode;
     EMSAEngine.recalculate(analysis);
     renderAnalysis($('report-name').textContent);
-    $(mode + '-table').querySelector(selector).focus({ preventScroll: true });
+    $('distribution-table').querySelector(selector).focus({ preventScroll: true });
   });
   document.addEventListener('click', (event) => {
     const toggle = event.target.closest('[data-pivot]');
     if (toggle && analysis) {
-      const mode = toggle.dataset.pivot;
       const index = Number(toggle.dataset.index);
-      if (expanded[mode].has(index)) expanded[mode].delete(index); else expanded[mode].add(index);
-      renderPivot(mode);
-      document.querySelector('[data-pivot="' + mode + '"][data-index="' + index + '"]').focus({ preventScroll: true });
+      if (expanded.has(index)) expanded.delete(index); else expanded.add(index);
+      renderDistribution();
+      document.querySelector('[data-pivot="distribution"][data-index="' + index + '"]').focus({ preventScroll: true });
     }
     const all = event.target.closest('[data-expand]');
     if (all && analysis) {
-      const mode = all.dataset.expand;
       const indices = analysis.categories.map((cat, index) => cat.subcategories.length ? index : null).filter((index) => index !== null);
-      const collapse = expanded[mode].size === indices.length;
-      expanded[mode].clear();
-      if (!collapse) indices.forEach((index) => expanded[mode].add(index));
-      renderPivot(mode);
+      const collapse = expanded.size === indices.length;
+      expanded.clear();
+      if (!collapse) indices.forEach((index) => expanded.add(index));
+      renderDistribution();
     }
   });
 })();
