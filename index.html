@@ -241,11 +241,12 @@ https://sheetjs.com/
     .creator-signature{flex-basis:100%;text-align:right;color:#5d737c;font-size:11px;font-weight:500}
     @media(max-width:600px){.topbar{height:auto;min-height:73px;flex-direction:column;align-items:flex-start;gap:12px;padding:18px 20px}.brand{font-size:18px}.local-indicator{margin-left:0}.creator-signature{flex-basis:auto;text-align:left}}
 
-    .distribution-chart{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:38px;align-items:center;padding:0 30px 25px;max-width:1000px;margin:auto}
-    #distribution-pie{display:block;width:100%;height:auto;overflow:visible}
+    .distribution-overview{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:start;padding:0 27px 24px}
+    .distribution-chart{display:grid;grid-template-columns:minmax(140px,180px) minmax(0,1fr);gap:20px;align-items:center;min-width:0;padding:0;margin:0}
+    #distribution-pie{display:block;width:100%;max-width:180px;height:auto;overflow:visible;margin:auto}
     .pie-label{fill:#fff;font-size:12px;font-weight:650;paint-order:stroke;stroke:#15323e55;stroke-width:2px}
     .pie-legend{list-style:none;padding:0;margin:0;display:grid;gap:0}
-    .pie-legend-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #edf0ef;font-size:11px;transition:opacity .3s ease}
+    .pie-legend-item{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #edf0ef;font-size:11px;transition:opacity .3s ease}
     .pie-legend-item:last-child{border-bottom:0}.pie-legend-item.is-empty{opacity:.5}
     .legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}.legend-name{font-weight:650}
     .legend-value{margin-left:auto;text-align:right;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}.legend-value strong{color:var(--ink);display:inline-block;min-width:65px;margin-left:10px;font-weight:600}
@@ -253,8 +254,16 @@ https://sheetjs.com/
     .pivot-table tr,.pivot-table td,.pivot-table span{transition:background-color .3s ease,color .3s ease}
     .subcategory-row{animation:detail-in .22s ease-out}
     @keyframes detail-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-    @media(max-width:760px){.distribution-chart{grid-template-columns:1fr;gap:12px;padding:0 18px 20px}#distribution-pie{max-width:260px;margin:auto}.pie-legend-item{font-size:10px;padding:8px 0}.legend-value strong{min-width:57px;margin-left:7px}}
-    @media print{.distribution-chart{grid-template-columns:240px 1fr;print-color-adjust:exact}.redistribution-checkbox,#select-file{display:none!important}}
+    .redistribution-summary{margin:0;min-width:0;border-radius:9px;background:#fffaf4}
+    .redistribution-summary .card-heading{padding:16px 17px 11px}.redistribution-summary .card-heading h2{font-size:15px}.redistribution-summary .card-heading p{font-size:10px}.redistribution-summary .section-number{color:#ac774b}
+    #redistribution-content{padding:0 17px 15px}.summary-sources{list-style:none;margin:0;padding:0}
+    .summary-sources li{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #efe4d7;font-size:11px}.source-name{font-weight:650}.source-name small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:3px}.summary-sources li>strong{color:#a33f3c;white-space:nowrap;font-variant-numeric:tabular-nums}.summary-sources small{font-weight:400}
+    .summary-pool{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;font-size:11px;color:#996039}.summary-pool strong{font-size:19px;white-space:nowrap;font-variant-numeric:tabular-nums}.summary-pool small{font-size:10px;font-weight:400}
+    .summary-destinations{display:grid;grid-template-columns:1fr 1fr;gap:9px}.summary-destinations>div{display:flex;flex-direction:column;gap:5px;background:#edf5f1;border:1px solid #dce9e0;border-radius:6px;padding:10px}.summary-destinations>div+div{background:#edf3f7;border-color:#dce6ec}.summary-destinations strong{font-size:11px}.summary-destinations small{font-size:9px;color:var(--muted)}.summary-added{color:#287c67;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}.summary-destinations>div+div .summary-added{color:#547d9c}.summary-note{margin:10px 0 0;color:var(--muted);font-size:10px;line-height:1.7}
+    .redistribution-rate{margin:10px 0 0 29px;max-width:260px;color:var(--ink)}.rate-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:10px}.rate-heading output{font-weight:700;font-variant-numeric:tabular-nums;color:#a33f3c;white-space:nowrap}.redistribution-rate input{display:block;cursor:pointer;width:100%;margin:4px 0 0;min-height:24px;accent-color:#b54444}.rate-scale{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;line-height:1}.rate-detail{display:block;font-size:10px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+    @media(max-width:1120px){.distribution-overview{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}.distribution-chart{grid-template-columns:1fr;gap:10px}.pie-legend-item{font-size:10px}}
+    @media(max-width:760px){.distribution-overview{grid-template-columns:1fr;gap:18px;padding:0 17px 20px}.distribution-chart{grid-template-columns:1fr;gap:10px}#distribution-pie{max-width:165px}.pie-legend-item{font-size:10px;padding:6px 0}.legend-value strong{min-width:57px;margin-left:7px}.redistribution-rate{margin-left:22px;max-width:220px}.redistribution-summary .card-heading{padding:14px 14px 10px}#redistribution-content{padding:0 14px 14px}}
+    @media print{.distribution-overview{grid-template-columns:1fr 1fr;print-color-adjust:exact}.distribution-chart{grid-template-columns:1fr}#distribution-pie{max-width:160px}.redistribution-checkbox,#select-file{display:none!important}.redistribution-rate input,.rate-scale{display:none}}
 </style>
 </head>
 <body>
@@ -300,24 +309,25 @@ https://sheetjs.com/
       </section>
 
       <section class="analysis-card ideal-card" aria-labelledby="distribution-title-main">
-        <div class="card-heading"><div class="number-title"><span class="section-number">01</span><div><h2 id="distribution-title-main">Distribución de tiempos entre Categorías</h2><p>Selecciona los tiempos que quieras redistribuir entre TEO y TCOpe.</p></div></div><div class="card-actions"><span class="tag tag-teal" id="conservation-label"><svg class="icon"><use href="#i-check"/></svg>Total conservado</span><button type="button" class="text-button" data-expand="distribution">Expandir todo</button></div></div>
+        <div class="card-heading"><div class="number-title"><span class="section-number">01</span><div><h2 id="distribution-title-main">Distribución de tiempos entre Categorías</h2><p>Selecciona categorías y ajusta qué porcentaje de sus tiempos quieres redistribuir.</p></div></div><div class="card-actions"><span class="tag tag-teal" id="conservation-label"><svg class="icon"><use href="#i-check"/></svg>Total conservado</span><button type="button" class="text-button" data-expand="distribution">Expandir todo</button></div></div>
         <div id="ideal-unavailable" class="notice notice-warning" hidden></div>
-        <div class="distribution-chart" id="distribution-chart">
-          <svg id="distribution-pie" viewBox="0 0 300 300" role="img" aria-labelledby="pie-title pie-description">
-            <title id="pie-title">Distribución de tiempos por categoría</title>
-            <desc id="pie-description"></desc>
-            <circle cx="150" cy="150" r="138" fill="#edf1f0"></circle>
-            <g id="pie-slices"></g><g id="pie-labels" aria-hidden="true"></g>
-          </svg>
-          <div><p class="chart-empty" id="chart-empty" hidden>No hay minutos válidos para mostrar en el gráfico.</p><ul id="pie-legend" class="pie-legend" aria-label="Minutos y porcentaje por categoría"></ul></div>
+        <div class="distribution-overview">
+          <div class="distribution-chart" id="distribution-chart">
+            <svg id="distribution-pie" viewBox="0 0 300 300" role="img" aria-labelledby="pie-title pie-description">
+              <title id="pie-title">Distribución de tiempos por categoría</title>
+              <desc id="pie-description"></desc>
+              <circle cx="150" cy="150" r="138" fill="#edf1f0"></circle>
+              <g id="pie-slices"></g><g id="pie-labels" aria-hidden="true"></g>
+            </svg>
+            <div><p class="chart-empty" id="chart-empty" hidden>No hay minutos válidos para mostrar en el gráfico.</p><ul id="pie-legend" class="pie-legend" aria-label="Minutos y porcentaje por categoría"></ul></div>
+          </div>
+          <section class="redistribution-card redistribution-summary" aria-labelledby="distribution-title">
+            <div class="card-heading"><div class="number-title"><span class="section-number">02</span><div><h2 id="distribution-title">Redistribución de tiempos</h2><p>Tiempo asignado a TEO y TCOpe.</p></div></div></div>
+            <div id="redistribution-content"></div>
+          </section>
         </div>
         <div id="distribution-table" class="table-container"></div>
-        <div class="table-note"><svg class="icon"><use href="#i-info"/></svg>Rojo: selección completa; naranja: selección parcial. Los tiempos seleccionados se reparten entre TEO y TCOpe según su proporción original. El indicador verde muestra el aumento en puntos porcentuales (pp).</div>
-      </section>
-
-      <section class="redistribution-card" aria-labelledby="distribution-title">
-        <div class="card-heading"><div class="number-title"><span class="section-number">02</span><div><h2 id="distribution-title">Redistribución de tiempos</h2><p>Selecciona categorías o subcategorías para repartir sus minutos entre TEO y TCOpe.</p></div></div><span class="tag tag-warm">CRITERIO PROPORCIONAL</span></div>
-        <div id="redistribution-content"></div>
+        <div class="table-note"><svg class="icon"><use href="#i-info"/></svg>Rojo: selección completa; naranja: selección parcial. Cada barra ajusta qué porcentaje de las subcategorías seleccionadas se redistribuye. El resto permanece en su categoría. TEO y TCOpe reciben el tiempo según su proporción original. El indicador verde muestra el aumento en puntos porcentuales (pp).</div>
       </section>
     </div>
     <footer><span><strong>EMSA</strong> · Análisis de rendimiento operacional</span><span>Matriz incorporada <span class="footer-dot">·</span> Cálculos en minutos <span class="footer-dot">·</span> Versión 1.0</span><span class="creator-signature">Creada por Agustín Muñoz R.</span></footer>
@@ -473,7 +483,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
       if (!categoryMap.has(key)) {
         var category = {
           id: String(code), code: String(code), name: String(name || code), role: categoryRole(code, name),
-          minutes: 0, adjustedMinutes: 0, percentage: 0, adjustedPercentage: 0, subcategories: [], _subMap: new Map()
+          minutes: 0, adjustedMinutes: 0, percentage: 0, adjustedPercentage: 0, redistributionRate: 100, subcategories: [], _subMap: new Map()
         };
         categoryMap.set(key, category);
         categories.push(category);
@@ -680,8 +690,15 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     var categories = analysis.categories, totalMinutes = analysis.totalMinutes, invalidRows = analysis.invalidRows;
     var teo = categories.find(function (category) { return category.role === 'TEO'; });
     var tcope = categories.find(function (category) { return category.role === 'TCOPE'; });
+    categories.forEach(function (category) {
+      category.redistributionRate = Number.isFinite(category.redistributionRate) ? Math.max(0, Math.min(100, category.redistributionRate)) : 100;
+    });
     var origins = categories.filter(function (category) { return category.role !== 'TEO' && category.role !== 'TCOPE' && category.subcategories.some(function (sub) { return sub.selected; }); });
-    var pool = sum(origins.map(function (category) { return sum(category.subcategories.filter(function (sub) { return sub.selected; }).map(function (sub) { return sub.minutes; })); }));
+    var sources = origins.map(function (category) {
+      var selectedMinutes = sum(category.subcategories.filter(function (sub) { return sub.selected; }).map(function (sub) { return sub.minutes; }));
+      return { code: category.code, name: category.name, selectedMinutes: selectedMinutes, rate: category.redistributionRate, minutes: selectedMinutes * category.redistributionRate / 100 };
+    });
+    var pool = sum(sources.map(function (source) { return source.minutes; }));
     var teoMinutes = teo ? teo.minutes : 0, tcopeMinutes = tcope ? tcope.minutes : 0;
     var base = teoMinutes + tcopeMinutes;
     var possible = invalidRows.length === 0 && base > EPSILON;
@@ -695,7 +712,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
       category.adjustedMinutes = category.minutes;
       category.subcategories.forEach(function (sub) { sub.adjustedMinutes = sub.minutes; });
       if (possible && origins.indexOf(category) !== -1) {
-        category.subcategories.forEach(function (sub) { if (sub.selected) sub.adjustedMinutes = 0; });
+        category.subcategories.forEach(function (sub) { if (sub.selected) sub.adjustedMinutes = sub.minutes * (1 - category.redistributionRate / 100); });
         category.adjustedMinutes = sum(category.subcategories.map(function (sub) { return sub.adjustedMinutes; }));
       }
       if (possible && (category === teo || category === tcope)) {
@@ -720,7 +737,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
         pool: pool, base: base, teoMinutes: teoMinutes, tcopeMinutes: tcopeMinutes,
         teoShare: teoShare, tcopeShare: tcopeShare, teoAdded: teoAdded, tcopeAdded: tcopeAdded,
         possible: possible, reason: reason,
-        sources: origins.map(function (category) { return { code: category.code, name: category.name, minutes: sum(category.subcategories.filter(function (sub) { return sub.selected; }).map(function (sub) { return sub.minutes; })) }; })
+        sources: sources
       };
     analysis.adjustedTotalMinutes = sum(categories.map(function (category) { return category.adjustedMinutes; }));
     return analysis;
@@ -813,7 +830,6 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
 
   function renderAnalysis(filename) {
     const a = analysis;
-    const r = a.redistribution;
     $('results').hidden = false;
     $('drop-zone').hidden = true;
     $('heading-actions').appendChild($('select-file'));
@@ -831,15 +847,20 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     $('kpi-total-detail').textContent = a.complete ? format(a.totalMinutes / 60) + ' horas equivalentes' : 'Total parcial: hay registros con minutos inválidos';
     $('kpi-rows').textContent = integerFormat.format(a.validRowCount);
     $('kpi-rows-detail').textContent = a.invalidRows.length ? integerFormat.format(a.invalidRows.length) + ' registros adicionales requieren revisión' : a.categories.filter((cat) => cat.minutes > 0).length + ' categorías con tiempo registrado';
+    document.querySelector('.report-badge').innerHTML = icon(a.complete ? 'check' : 'info') + (a.complete ? 'Reporte procesado' : 'Requiere revisión');
+    renderDiagnostics();
+    renderSimulation();
+  }
+
+  function renderSimulation() {
+    const r = analysis.redistribution;
     $('kpi-pool').innerHTML = format(r.pool) + '<small>min</small>';
     $('kpi-pool-detail').textContent = pct(percent(r.pool)) + ' del tiempo total';
     $('kpi-ideal').textContent = r.possible ? pct(percent(r.base + r.pool)) : 'No disponible';
     $('kpi-ideal-detail').textContent = r.possible ? 'Desde ' + pct(percent(r.base)) + ' en el reporte original' : 'Revisa las condiciones de redistribución';
-    document.querySelector('.report-badge').innerHTML = icon(a.complete ? 'check' : 'info') + (a.complete ? 'Reporte procesado' : 'Requiere revisión');
     $('conservation-label').hidden = !r.possible;
     $('ideal-unavailable').hidden = r.possible;
     $('ideal-unavailable').textContent = r.reason + ' La tabla conserva la distribución original hasta que sea posible calcularla.';
-    renderDiagnostics();
     renderDistribution();
     renderPie();
     renderRedistribution();
@@ -863,7 +884,8 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
           Array.from(child.attributes).forEach((attr) => {
             if (!(preserveOpen && attr.name === 'open') && existing.getAttribute(attr.name) !== attr.value) existing.setAttribute(attr.name, attr.value);
           });
-          if (child.tagName === 'INPUT') existing.checked = child.checked;
+          if (child.tagName === 'INPUT' && child.type === 'checkbox') existing.checked = child.checked;
+          if (child.tagName === 'INPUT' && child.type === 'range' && existing.value !== child.value) existing.value = child.value;
           syncChildren(existing, child);
         }
       });
@@ -925,12 +947,18 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
       const selectedCount = cat.subcategories.filter((sub) => sub.selected).length;
       const redistributionSource = selectedCount > 0 && selectedCount === cat.subcategories.length;
       const partial = selectedCount > 0 && !redistributionSource;
-      const zeroed = a.redistribution.possible && redistributionSource;
+      const zeroed = a.redistribution.possible && redistributionSource && Math.abs(cat.adjustedMinutes) < 0.000001;
       const id = 'distribution-category-' + index;
       const description = '<span class="category-text"><span class="category-code">' + escapeHTML(cat.code) + '</span><span class="category-description">' + escapeHTML(cat.name) + '</span></span>';
       let category = '<span class="category-title"><span class="category-dot" style="background:' + color(cat) + '"></span>' + description + '</span>';
       if (hasChildren) category = '<button type="button" class="category-toggle" data-pivot="distribution" data-index="' + index + '" aria-expanded="' + open + '" aria-controls="' + id + '-detail" aria-label="' + (open ? 'Contraer ' : 'Expandir ') + escapeHTML(cat.code) + '">' + icon('chevron') + '<span class="category-dot" style="background:' + color(cat) + '"></span>' + description + '</button>';
       category = '<div class="category-selection">' + (selectable ? selectionCheckbox(index, null, redistributionSource, cat.code) : '') + category + '</div>';
+      if (selectable && selectedCount > 0) {
+        const selectedMinutes = EMSAEngine.sum(cat.subcategories.filter((sub) => sub.selected).map((sub) => sub.minutes));
+        const rateId = 'redistribution-rate-' + index;
+        const moved = selectedMinutes * cat.redistributionRate / 100;
+        category += '<div class="redistribution-rate"><div class="rate-heading"><label for="' + rateId + '">Porcentaje a redistribuir</label><output for="' + rateId + '" id="' + rateId + '-value">' + integerFormat.format(cat.redistributionRate) + ' %</output></div><input type="range" id="' + rateId + '" data-redistribution-rate="' + index + '" min="0" max="100" step="1" value="' + cat.redistributionRate + '" aria-label="Porcentaje a redistribuir de ' + escapeHTML(cat.code) + '" aria-valuetext="' + cat.redistributionRate + ' % del tiempo seleccionado" aria-describedby="' + rateId + '-detail"><div class="rate-scale" aria-hidden="true"><span>0 %</span><span>100 %</span></div><span class="rate-detail" id="' + rateId + '-detail">' + format(moved) + ' de ' + format(selectedMinutes) + ' min seleccionados</span></div>';
+      }
       const change = a.redistribution.possible && Math.abs(delta) > 0.000001 ? '<span class="change-value' + (delta < 0 ? ' negative' : '') + '">' + (delta > 0 ? '+' : '−') + format(Math.abs(delta)) + ' min</span>' : '';
       rows.push('<tbody><tr class="category-row' + (redistributionSource ? ' redistribution-source' : partial ? ' redistribution-partial' : '') + (zeroed ? ' zeroed' : '') + '"><td>' + category + '</td><td class="numeric"><span class="minutes-number" title="' + preciseFormat.format(cat[minutesKey]) + ' min">' + format(cat[minutesKey]) + '</span>' + change + '</td><td class="numeric">' + percentageCell(cat[percentageKey], color(cat)) + (a.redistribution.possible && ['TEO', 'TCOPE'].includes(cat.role) && a.totalMinutes > 0 ? '<span class="percentage-increase" title="Aumento en puntos porcentuales respecto a la distribución original">+ ' + percentageFormat.format(Math.max(0, cat.adjustedPercentage - cat.percentage)) + ' pp' + '</span>' : '') + '</td></tr></tbody>');
       if (hasChildren) {
@@ -999,16 +1027,12 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
 
   function renderRedistribution() {
     const r = analysis.redistribution;
-    const donors = r.sources.map((source) => '<article class="donor-card"><p>' + escapeHTML(source.code) + '</p><span>' + escapeHTML(source.name) + '</span><strong>' + format(source.minutes) + '<small class="unit">min</small></strong></article>').join('');
-    const pool = '<div class="pool-row"><span>Tiempo a redistribuir <strong>' + format(r.pool) + ' min</strong></span></div>';
-    let proportional;
-    if (r.possible) {
-      const dest = (code, base, share, added, secondary) => '<article class="destination-card' + (secondary ? ' complementary' : '') + '"><div class="destination-top"><strong>' + code + '</strong><span>' + pct(share * 100) + ' de la redistribución</span></div><p class="destination-added">+' + format(added) + '<small class="unit">min</small></p><div class="destination-formula">' + format(r.pool) + ' min × (' + format(base) + ' / ' + format(r.base) + ')<br>' + format(base) + ' min originales → <strong>' + format(base + added) + ' min</strong></div></article>';
-      proportional = '<div class="proportion-panel"><div class="proportion-heading"><strong>Proporción original de la base operacional</strong><span>Base = TEO + TCOpe = ' + format(r.base) + ' min</span></div><div class="proportion-bar" role="img" aria-label="TEO ' + pct(r.teoShare * 100) + ' y TCOpe ' + pct(r.tcopeShare * 100) + '"><span class="proportion-part" style="width:' + r.teoShare * 100 + '%;background:' + colors.TEO + '">' + (r.teoShare >= .12 ? 'TEO · ' + pct(r.teoShare * 100) : '') + '</span><span class="proportion-part" style="width:' + r.tcopeShare * 100 + '%;background:' + colors.TCOpe + '">' + (r.tcopeShare >= .12 ? 'TCOpe · ' + pct(r.tcopeShare * 100) : '') + '</span></div><div class="destination-grid">' + dest('TEO', r.teoMinutes, r.teoShare, r.teoAdded, false) + dest('TCOpe', r.tcopeMinutes, r.tcopeShare, r.tcopeAdded, true) + '</div><p class="distribution-explanation">' + (r.pool ? 'Los tiempos seleccionados se reparten entre TEO y TCOpe. Las subcategorías no seleccionadas conservan sus minutos.' : 'No hay minutos seleccionados para redistribuir. La distribución conserva los tiempos originales.') + ' Los cálculos conservan su precisión; la vista redondea a dos decimales.</p></div>';
-    } else {
-      proportional = '<div class="proportion-panel"><div class="notice notice-warning">' + escapeHTML(r.reason) + ' No se aplica ninguna redistribución.</div></div>';
-    }
-    updateContent('redistribution-content', '<div class="donor-grid">' + donors + '</div>' + pool + proportional);
+    const sources = r.sources.map((source) => '<li><span class="source-name">' + escapeHTML(source.code) + '<small>' + integerFormat.format(source.rate) + ' % de ' + format(source.selectedMinutes) + ' min</small></span><strong>' + format(source.minutes) + ' <small>min</small></strong></li>').join('');
+    const pool = '<div class="summary-pool"><span>Tiempo a redistribuir</span><strong>' + format(r.pool) + '<small> min</small></strong></div>';
+    const destinations = r.possible
+      ? '<div class="summary-destinations"><div><strong>TEO</strong><span class="summary-added">+' + format(r.teoAdded) + ' <small>min</small></span><small>' + pct(r.teoShare * 100) + ' del reparto</small></div><div><strong>TCOpe</strong><span class="summary-added">+' + format(r.tcopeAdded) + ' <small>min</small></span><small>' + pct(r.tcopeShare * 100) + ' del reparto</small></div></div><p class="summary-note">Reparto según los minutos originales de TEO y TCOpe. El tiempo no redistribuido se conserva.</p>'
+      : '<p class="summary-note">' + escapeHTML(r.reason) + '</p>';
+    updateContent('redistribution-content', (sources ? '<ul class="summary-sources">' + sources + '</ul>' : '<p class="summary-note">Selecciona una categoría en la tabla para simular su redistribución.</p>') + pool + destinations);
   }
 
   function renderMatrix() {
@@ -1069,6 +1093,15 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
   });
   document.addEventListener('dragover', (event) => { if (event.dataTransfer && Array.from(event.dataTransfer.types).includes('Files')) event.preventDefault(); });
   document.addEventListener('drop', (event) => { if (event.dataTransfer && event.dataTransfer.files.length) event.preventDefault(); });
+  document.addEventListener('input', (event) => {
+    const input = event.target.closest('[data-redistribution-rate]');
+    if (!input || !analysis) return;
+    const cat = analysis.categories[Number(input.dataset.redistributionRate)];
+    if (!cat || ['TEO', 'TCOPE'].includes(cat.role)) return;
+    cat.redistributionRate = Number(input.value);
+    EMSAEngine.recalculate(analysis);
+    renderSimulation();
+  });
   document.addEventListener('change', (event) => {
     const input = event.target.closest('[data-select-category], [data-select-subcategory]');
     if (!input || !analysis) return;
@@ -1079,7 +1112,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     else cat.subcategories[Number(input.dataset.subIndex)].selected = input.checked;
     const selector = input.hasAttribute('data-select-category') ? '[data-select-category="' + index + '"]' : '[data-select-subcategory="' + index + '"][data-sub-index="' + input.dataset.subIndex + '"]';
     EMSAEngine.recalculate(analysis);
-    renderAnalysis($('report-name').textContent);
+    renderSimulation();
     $('distribution-table').querySelector(selector).focus({ preventScroll: true });
   });
   document.addEventListener('click', (event) => {
