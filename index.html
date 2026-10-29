@@ -347,7 +347,7 @@ https://sheetjs.com/
           <article class="kpi-card"><p>HORAS DÍAS PERFORANDO</p><strong id="performance-hours">—</strong><span id="performance-hours-detail"></span></article>
           <article class="kpi-card kpi-teal"><p>RENDIMIENTO</p><strong id="performance-daily">—</strong><span id="performance-daily-detail"></span></article>
         </div>
-        <div class="table-note"><svg class="icon"><use href="#i-info"/></svg>TEO histórico de Actividades = (HORAS CLIENTE + HORAS EECC de los ID TEO) / 60; metros = suma de (Hasta − Desde) en PERFORACIÓN. ROP mensual = metros / horas TEO. Rendimiento = (24 h × proporción TEO resultante) × promedio simple del ROP seleccionado. Los cálculos usan todos los decimales.</div>
+        <div class="table-note"><svg class="icon"><use href="#i-info"/></svg>TEO histórico de Detalles = (HORAS CLIENTE + HORAS EECC de las actividades TEO según la matriz) / 60, agrupado por mes. Metros = suma de (Hasta − Desde) en PERFORACIÓN. ROP mensual = metros / horas TEO. Rendimiento = (24 h × proporción TEO resultante) × promedio simple del ROP seleccionado. Los cálculos usan todos los decimales.</div>
       </section>
     </div>
     <footer><span><strong>EMSA</strong> · Análisis de rendimiento operacional</span><span>Matriz incorporada <span class="footer-dot">·</span> Cálculos en minutos <span class="footer-dot">·</span> Versión 1.0</span><span class="creator-signature">Creada por Agustín Muñoz R.</span></footer>
@@ -769,7 +769,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
     var result = { months: [], issues: [] };
     var names = workbook.SheetNames || Object.keys(workbook.Sheets || {});
     var drillingName = names.find(function (name) { return normalize(name) === 'PERFORACION'; });
-    var activitiesName = names.find(function (name) { return normalize(name) === 'ACTIVIDADES'; });
+    var detailsName = names.find(function (name) { return normalize(name) === 'DETALLES'; });
     var date1904 = workbook.Workbook && workbook.Workbook.WBProps && [true, 1, '1', 'true'].indexOf(workbook.Workbook.WBProps.date1904) !== -1;
     var months = new Map(), globalDrillingError = false, globalTimeError = false;
     function issue(sheet, row, message) { result.issues.push({ sheet: sheet, row: row, message: message }); }
@@ -827,39 +827,36 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
       }
       if (!months.size && drillingHeader) issue(drillingName, null, 'No hay registros de perforación con una fecha válida.');
     }
-    if (!activitiesName) { globalTimeError = true; issue('Actividades', null, 'Falta la hoja Actividades para obtener el TEO histórico mensual.'); }
+    if (!detailsName) { globalTimeError = true; issue('Detalles', null, 'Falta la hoja Detalles para obtener el TEO histórico mensual.'); }
     else {
-      var activityRows = sheetRows(workbook.Sheets[activitiesName], activitiesName);
-      var definitions = {
-        date: dateHeaders,
-        id: ['ID', 'ID ACTIVIDAD', 'CODIGO ACTIVIDAD'], activity: ['ACTIVIDAD'],
-        client: FIELDS.client, contractor: FIELDS.contractor
-      };
-      var activityHeader = headers(activityRows, definitions, function (f) {
-        return f.date != null && (f.id != null || f.activity != null) && f.client != null && f.contractor != null;
-      });
-      if (!activityHeader) {
-        globalTimeError = true; issue(activitiesName, null, 'Se requieren FECHA, ID o ACTIVIDAD, HORAS CLIENTE y HORAS EECC. Los tiempos de ambas columnas se interpretan en minutos.');
-      } else {
-        var af = activityHeader.fields, prepared = prepareMatrix(matrix), unknown = new Set();
-        activityRows.slice(activityHeader.index + 1).forEach(function (row) {
+      var detailRows = sheetRows(workbook.Sheets[detailsName], detailsName), detailHeader;
+      try { detailHeader = findHeader(detailRows); }
+      catch (error) { globalTimeError = true; issue(detailsName, null, error.message); }
+      if (detailHeader && detailHeader.fields.date == null) {
+        globalTimeError = true; issue(detailsName, null, 'Se requiere la columna FECHA en Detalles para agrupar el TEO por mes.');
+      } else if (detailHeader) {
+        var af = detailHeader.fields, prepared = prepareMatrix(matrix), unknown = new Set();
+        detailRows.slice(detailHeader.index + 1).forEach(function (row) {
           var cells = row.cells;
-          if (!cells.some(function (cell) { return !isBlank(cell); }) || isSummary(cells)) return;
-          if (dateHeaders.indexOf(headerKey(cells[af.date])) !== -1) return;
-          var activity = af.id != null && !isBlank(cells[af.id]) ? cells[af.id] : cells[af.activity];
-          if (isBlank(activity) && isBlank(cells[af.client]) && isBlank(cells[af.contractor])) return;
-          var activityId = extractActivityId(rawValue(activity), prepared.index), known = prepared.index.get(activityId);
+          if (!cells.some(function (cell) { return !isBlank(cell); })) return;
+          var repeated = identifyHeaders(cells);
+          if (repeated.activity != null && repeated.client != null && repeated.contractor != null) return;
+          var activity = rawValue(cells[af.activity]), activityText = String(activity == null ? '' : activity).trim();
+          var activityId = extractActivityId(activity, prepared.index), known = prepared.index.get(activityId);
+          var totalPattern = /^(?:GRAN\s+TOTAL|TOTAL(?:\s+GENERAL)?|SUBTOTAL)(?:\s*[:\-]?\s*)$/;
+          if (cells.some(function (cell) { return totalPattern.test(normalize(rawValue(cell))); }) && !known && (!activityText || totalPattern.test(normalize(activityText)))) return;
+          if (!activityText && isBlank(cells[af.client]) && isBlank(cells[af.contractor])) return;
           if (!known) {
-            if (!unknown.has(activityId)) { unknown.add(activityId); issue(activitiesName, row.rowNumber, 'ID ' + (activityId || '(vacío)') + ' sin correspondencia en la matriz; no se incluye en el TEO histórico.'); }
+            if (!unknown.has(activityId)) { unknown.add(activityId); issue(detailsName, row.rowNumber, 'ID ' + (activityId || '(vacío)') + ' sin correspondencia en la matriz; no se incluye en el TEO histórico.'); }
             return;
           }
           if (known.category.role !== 'TEO') return;
           var key = monthKey(cells[af.date]);
-          if (!key) { globalTimeError = true; issue(activitiesName, row.rowNumber, 'Fecha inválida en un registro TEO.'); return; }
+          if (!key) { globalTimeError = true; issue(detailsName, row.rowNumber, 'Fecha inválida en un registro TEO.'); return; }
           if (!months.has(key)) return; // Only months present in PERFORACIÓN form columns.
           var month = months.get(key), values = [parseMinutes(cells[af.client]), parseMinutes(cells[af.contractor])];
           if (values.every(function (v) { return v.empty; }) || values.some(function (v) { return !v.valid || v.value < 0; })) {
-            month.timeErrors++; issue(activitiesName, row.rowNumber, 'HORAS CLIENTE y HORAS EECC deben contener minutos numéricos y no negativos para calcular el TEO.'); return;
+            month.timeErrors++; issue(detailsName, row.rowNumber, 'HORAS CLIENTE y HORAS EECC deben contener minutos numéricos y no negativos para calcular el TEO.'); return;
           }
           month.times.push(sum(values.map(function (v) { return v.value; })));
         });
@@ -1202,7 +1199,7 @@ t.sheetStubs=true}if(t.type=="array"){t.type="binary";var a=xk(e,t);t.type="arra
       const header = months.map((month) => '<th scope="col" class="' + (selectedPerformanceMonths.has(month.key) ? 'month-selected' : '') + '"><label class="month-selector"><input type="checkbox" data-performance-month="' + month.key + '"' + (selectedPerformanceMonths.has(month.key) ? ' checked' : '') + ' aria-label="Incluir ' + escapeHTML(monthLabel(month.key)) + ' en el ROP promedio"><span>' + escapeHTML(monthLabel(month.key)) + '</span></label></th>').join('');
       const row = (label, field, cls) => '<tr' + (cls ? ' class="' + cls + '"' : '') + '><th scope="row">' + label + '</th>' + months.map((month) => '<td data-month="' + month.key + '" data-metric="' + field + '" class="' + (selectedPerformanceMonths.has(month.key) ? 'month-selected' : '') + '"' + (month[field] == null ? ' title="No hay datos válidos suficientes para calcular este valor"' : '') + '>' + cellValue(month[field]) + '</td>').join('') + '</tr>';
       updateContent('performance-table', '<table class="performance-table"><caption class="visually-hidden">TEO histórico, metros perforados y ROP mensual. Selecciona los meses del promedio.</caption><thead><tr><th scope="col">INDICADOR / MES</th>' + header + '</tr></thead><tbody>' + row('TEO (horas)', 'teoHours') + row('Metros reales perforados (m)', 'meters') + row('ROP (m/hr)', 'rop', 'rop-row') + '</tbody></table>');
-    } else updateContent('performance-table', '<p class="performance-empty">Importa un Excel con las hojas PERFORACIÓN y Actividades para calcular el rendimiento diario.</p>');
+    } else updateContent('performance-table', '<p class="performance-empty">Importa un Excel con las hojas PERFORACIÓN y Detalles para calcular el rendimiento diario.</p>');
     $('performance-average').innerHTML = cellValue(metrics.averageROP) + '<small>m/hr</small>';
     $('performance-average-detail').textContent = !metrics.selectedCount ? 'Selecciona al menos un mes.' : metrics.averageROP == null ? 'Hay meses seleccionados sin ROP válido. Revisa el TEO y los metros de esos meses.' : 'Promedio simple de ' + metrics.selectedCount + (metrics.selectedCount === 1 ? ' mes seleccionado.' : ' meses seleccionados.');
     $('performance-hours').innerHTML = cellValue(metrics.hoursPerDay) + '<small>h/día</small>';
